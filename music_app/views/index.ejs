@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2/webcomponents-bundle.js"></script>
+    <script src="https://unpkg.com/tone"></script>
+    <script src="https://unpkg.com/@tonejs/ui"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    
+    <title>MUSIC</title>
+
+    <tone-demo autoplay>
+        <tone-keyboard octaves="3"></tone-keyboard>
+    </tone-demo>
+</head>
+<body>
+    <h1>HELLO</h1>
+    
+</body>
+<script>
+
+
+        const synth = new Tone.AMSynth().toMaster();
+        
+        var socket = io();
+                   
+
+        document.querySelector('tone-keyboard').addEventListener('noteon', e => {
+            socket.emit('sound',{data:e.detail.name});
+            synth.triggerAttack(e.detail.name);
+        });
+
+        socket.on('trigger', function (data) { 
+            console.log("playing"); 
+            synth.triggerAttack(data);
+        });    
+        
+        // socket.on('end_play', function (data){
+        //     console.log("off");
+            
+
+        // })
+
+       
+
+        document.querySelector('tone-keyboard').addEventListener('noteoff', e => {
+            socket.emit('sound-off');
+            synth.triggerRelease();
+        });
+        
+        socket.on('trigger-off', function (data) { 
+        console.log("stop-playing"); 
+        synth.triggerRelease();
+        }); 
+    
+</script>
+<style>
+#content{
+    width:500px;
+    height: 150px;
+}
+
+</style>
+</html>
